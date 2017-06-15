@@ -1,0 +1,168 @@
+This raw design is focues on tournament functionality, The Security and roles will be dealt later in next design.
+--CreatedOn,CreatedBy,UpdatedOn,UpdatedBy is supposed to exist in each table
+-- The fields with the * after them are Primary keys and fields with ** are foreignKeys
+
+LookUpType
+	LookUpTypeID*
+	Name
+	CreatedOn
+	CreatedBy
+	UpdatedOn
+	UpdatedBy
+	
+lookup
+	LookupID*
+	lookUpTypeID**
+	Name
+	Active
+	CreatedOn
+	CreatedBy
+	UpdatedOn
+	UpdatedBy
+
+User
+	UserID*
+	FName
+	LName,
+	email,
+	username,
+	password,
+	phone,
+	image,
+	--RoleType**(a lookup)(will define tables for security later)
+	Active,
+	CreatedOn
+	CreatedBy
+	UpdatedOn
+	UpdatedBy
+
+Player
+	PlayerID*
+	FName
+	LName
+	--Gender,
+	Country**(a lookup)
+	profileimage,
+	backgroundimage,
+	email,
+	phone,
+	username,
+	password,
+	Xboxgamertag
+	PSNGamertag	
+	--OtherGamerTag,
+	--FeePaid(true/false).
+	emailverified
+	DOB
+	Active,
+	--Alerts,
+	CreatedOn
+	CreatedBy
+	UpdatedOn
+	UpdatedBy
+
+Tournament
+	TournamentID*
+	Name,
+	RegistrationStartTime,
+	RegistrationEndTime,
+	StartDate,
+	EndDate
+	Type**(a lookup)(single/double/trippler etc)
+	GameType**(a lookup)(fifa/CS/other)
+	gameserver(a lookup,XboX/PSN)
+	Fee,
+	Bracketloosened(bit/Tells if the Bracket is completed,matches fixed,and ready to show to participents)
+	Active,
+	CreatedOn
+	CreatedBy
+	UpdatedOn
+	UpdatedBy
+
+TeamGroup
+	TeamGroupID*
+	TournamentID**
+	Name(unique within tournament)
+	CreatedOn
+	CreatedBy
+	UpdatedOn
+	UpdatedBy
+
+Team 
+	TeamID*
+	TeamGroupID**
+	Name
+	Active
+	CreatedOn
+	CreatedBy
+	UpdatedOn
+	UpdatedBy
+
+TournamentPlayer
+	TournamentPlayerID*,
+	TournamentID*
+	PlayerID**
+	TeamID**
+	PointsScored
+	--DisplayName(Excluded)
+	Active
+	CreatedOn
+	CreatedBy
+	UpdatedOn
+	UpdatedBy
+
+Match
+	MatchID*
+	TournamentID**
+	Round**(a lookup)(round1/round2/quaterfinal/final etc)
+	Team1ID**
+	Team2ID**
+	StartTime,
+	ENDTime,
+	Team1Score,
+	Team2Score,
+	Venue,
+	WinningTeamID**
+	--completed(may be not required)
+	CreatedOn
+	CreatedBy
+	UpdatedOn
+	UpdatedBy
+
+Prize
+	PrizeID*
+	PrizeTag**(a lookup)(1st/2nd/3rd)
+	ReceiverPlayeriD**(may be not required)
+	tournamentID**
+	PrizeAmount
+	IsPaid
+	PayDate
+	CreatedOn
+	CreatedBy
+	UpdatedOn
+	UpdatedBy
+	
+News
+	NewsID
+	--NewsType
+	Name
+	ShortDesc
+	LongDesc
+	Actiive
+	StartTime
+	ENDTIME
+	CreatedOn
+	CreatedBy
+	UpdatedOn
+	UpdatedBy
+	
+TournamentRule 	
+	RuleID
+	Name
+	Desc
+	TournamentID**
+	CreatedOn
+	CreatedBy
+	UpdatedOn
+	UpdatedBy
+	

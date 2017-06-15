@@ -1,0 +1,326 @@
+/*
+SQLyog Ultimate v11.33 (64 bit)
+MySQL - 5.7.14 : Database - esportsdeluxe
+*********************************************************************
+*/
+
+/*!40101 SET NAMES utf8 */;
+
+/*!40101 SET SQL_MODE=''*/;
+
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`esportsdeluxe` /*!40100 DEFAULT CHARACTER SET latin1 */;
+
+USE `esportsdeluxe`;
+
+/*Table structure for table `lookup` */
+
+DROP TABLE IF EXISTS `lookup`;
+
+CREATE TABLE `lookup` (
+  `LookUpID` int(11) NOT NULL AUTO_INCREMENT,
+  `LookUpTypeID` int(11) NOT NULL,
+  `Name` varchar(20) NOT NULL,
+  `Description` varchar(60) DEFAULT NULL,
+  `Active` bit(1) DEFAULT NULL,
+  `CreatedOn` datetime NOT NULL,
+  `CreatedBy` int(11) NOT NULL,
+  `UpdatedOn` datetime DEFAULT NULL,
+  `UpdatedBy` int(11) DEFAULT NULL,
+  PRIMARY KEY (`LookUpID`),
+  KEY `lookup_LookUpType` (`LookUpTypeID`),
+  KEY `lookup_CreatedBy` (`CreatedBy`),
+  KEY `lookup_UpdatedBy` (`UpdatedBy`),
+  CONSTRAINT `lookup_CreatedBy` FOREIGN KEY (`CreatedBy`) REFERENCES `users` (`UserID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `lookup_LookUpType` FOREIGN KEY (`LookUpTypeID`) REFERENCES `lookuptype` (`LookUpTypeID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `lookup_UpdatedBy` FOREIGN KEY (`UpdatedBy`) REFERENCES `users` (`UserID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `lookuptype` */
+
+DROP TABLE IF EXISTS `lookuptype`;
+
+CREATE TABLE `lookuptype` (
+  `LookUpTypeID` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(20) NOT NULL,
+  `Description` varchar(60) DEFAULT NULL,
+  `CreatedOn` datetime NOT NULL,
+  `CreatedBy` int(11) NOT NULL,
+  `UpdatedOn` datetime DEFAULT NULL,
+  `UpdatedBy` int(11) DEFAULT NULL,
+  PRIMARY KEY (`LookUpTypeID`),
+  KEY `lookuptype_CreatedBy` (`CreatedBy`),
+  KEY `lookuptype_UpdatedBy` (`UpdatedBy`),
+  CONSTRAINT `lookuptype_CreatedBy` FOREIGN KEY (`CreatedBy`) REFERENCES `users` (`UserID`),
+  CONSTRAINT `lookuptype_UpdatedBy` FOREIGN KEY (`UpdatedBy`) REFERENCES `users` (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `match` */
+
+DROP TABLE IF EXISTS `match`;
+
+CREATE TABLE `match` (
+  `MatchID` int(11) NOT NULL AUTO_INCREMENT,
+  `TournamentID` int(11) NOT NULL,
+  `Round` int(11) DEFAULT NULL COMMENT '(a lookup)(round1/round2/quaterfinal/final etc)',
+  `Team1ID` int(11) DEFAULT NULL,
+  `Team2ID` int(11) DEFAULT NULL,
+  `StartTime` datetime DEFAULT NULL,
+  `ENDTime` datetime DEFAULT NULL,
+  `Team1Score` float DEFAULT NULL,
+  `Team2Score` float DEFAULT NULL,
+  `Venue` int(11) DEFAULT NULL,
+  `WinningTeamID` int(11) DEFAULT NULL,
+  `CreatedOn` datetime NOT NULL,
+  `CreatedBy` int(11) NOT NULL,
+  `UpdatedOn` datetime DEFAULT NULL,
+  `UpdatedBy` int(11) DEFAULT NULL,
+  PRIMARY KEY (`MatchID`),
+  KEY `TournamentID` (`TournamentID`),
+  KEY `Round` (`Round`),
+  KEY `Team1ID` (`Team1ID`),
+  KEY `Team2ID` (`Team2ID`),
+  KEY `Venue` (`Venue`),
+  KEY `WinningTeamID` (`WinningTeamID`),
+  KEY `CreatedBy` (`CreatedBy`),
+  KEY `UpdatedBy` (`UpdatedBy`),
+  CONSTRAINT `match_ibfk_1` FOREIGN KEY (`TournamentID`) REFERENCES `tournament` (`TournamentID`),
+  CONSTRAINT `match_ibfk_2` FOREIGN KEY (`Round`) REFERENCES `lookup` (`LookUpID`),
+  CONSTRAINT `match_ibfk_3` FOREIGN KEY (`Team1ID`) REFERENCES `team` (`TeamID`),
+  CONSTRAINT `match_ibfk_4` FOREIGN KEY (`Team2ID`) REFERENCES `team` (`TeamID`),
+  CONSTRAINT `match_ibfk_5` FOREIGN KEY (`Venue`) REFERENCES `lookup` (`LookUpID`),
+  CONSTRAINT `match_ibfk_6` FOREIGN KEY (`WinningTeamID`) REFERENCES `team` (`TeamID`),
+  CONSTRAINT `match_ibfk_7` FOREIGN KEY (`CreatedBy`) REFERENCES `users` (`UserID`),
+  CONSTRAINT `match_ibfk_8` FOREIGN KEY (`UpdatedBy`) REFERENCES `users` (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `news` */
+
+DROP TABLE IF EXISTS `news`;
+
+CREATE TABLE `news` (
+  `NewsID` int(11) NOT NULL,
+  `Name` varchar(30) NOT NULL,
+  `ShortDesc` varchar(150) DEFAULT NULL,
+  `LongDesc` varchar(500) DEFAULT NULL,
+  `Actiive` bit(1) DEFAULT NULL,
+  `StartTime` datetime DEFAULT NULL,
+  `EndTime` datetime DEFAULT NULL,
+  `CreatedOn` datetime NOT NULL,
+  `CreatedBy` int(11) NOT NULL,
+  `UpdatedOn` datetime DEFAULT NULL,
+  `UpdatedBy` int(11) DEFAULT NULL,
+  PRIMARY KEY (`NewsID`,`CreatedOn`,`CreatedBy`),
+  KEY `CreatedBy` (`CreatedBy`),
+  KEY `UpdatedBy` (`UpdatedBy`),
+  CONSTRAINT `news_ibfk_1` FOREIGN KEY (`CreatedBy`) REFERENCES `users` (`UserID`),
+  CONSTRAINT `news_ibfk_2` FOREIGN KEY (`UpdatedBy`) REFERENCES `users` (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `player` */
+
+DROP TABLE IF EXISTS `player`;
+
+CREATE TABLE `player` (
+  `PlayerID` int(11) NOT NULL AUTO_INCREMENT,
+  `FName` varchar(20) NOT NULL,
+  `LName` varchar(20) NOT NULL,
+  `username` varchar(20) DEFAULT NULL,
+  `password` varchar(20) NOT NULL,
+  `DOB` date NOT NULL,
+  `Country` int(11) DEFAULT NULL COMMENT 'a lookup',
+  `profileimage` varchar(60) DEFAULT NULL,
+  `backgroundimage` varchar(60) DEFAULT NULL,
+  `email` varchar(20) NOT NULL,
+  `Xboxgamertag` varchar(30) DEFAULT NULL,
+  `PSNGamertag` varchar(30) DEFAULT NULL,
+  `emailverified` bit(1) NOT NULL,
+  `Active` bit(1) NOT NULL,
+  `CreatedOn` date NOT NULL,
+  `UpdatedOn` date DEFAULT NULL,
+  PRIMARY KEY (`PlayerID`),
+  KEY `Country` (`Country`),
+  CONSTRAINT `player_ibfk_1` FOREIGN KEY (`Country`) REFERENCES `lookup` (`LookUpID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `prize` */
+
+DROP TABLE IF EXISTS `prize`;
+
+CREATE TABLE `prize` (
+  `PrizeID` int(11) NOT NULL AUTO_INCREMENT,
+  `PrizeTag` int(11) DEFAULT NULL COMMENT '(a lookup)(1st/2nd/3rd)',
+  `ReceiverPlayeriD` int(11) DEFAULT NULL,
+  `tournamentID` int(11) DEFAULT NULL,
+  `PrizeAmount` float DEFAULT NULL,
+  `IsPaid` bit(1) DEFAULT NULL,
+  `PayDate` datetime DEFAULT NULL,
+  `CreatedOn` datetime DEFAULT NULL,
+  `CreatedBy` int(11) DEFAULT NULL,
+  `UpdatedOn` datetime DEFAULT NULL,
+  `UpdatedBy` int(11) DEFAULT NULL,
+  PRIMARY KEY (`PrizeID`),
+  KEY `PrizeTag` (`PrizeTag`),
+  KEY `ReceiverPlayeriD` (`ReceiverPlayeriD`),
+  KEY `CreatedBy` (`CreatedBy`),
+  KEY `UpdatedBy` (`UpdatedBy`),
+  CONSTRAINT `prize_ibfk_1` FOREIGN KEY (`PrizeTag`) REFERENCES `lookup` (`LookUpID`),
+  CONSTRAINT `prize_ibfk_2` FOREIGN KEY (`ReceiverPlayeriD`) REFERENCES `tournamentplayer` (`TournamentPlayerID`),
+  CONSTRAINT `prize_ibfk_3` FOREIGN KEY (`CreatedBy`) REFERENCES `users` (`UserID`),
+  CONSTRAINT `prize_ibfk_4` FOREIGN KEY (`UpdatedBy`) REFERENCES `users` (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `team` */
+
+DROP TABLE IF EXISTS `team`;
+
+CREATE TABLE `team` (
+  `TeamID` int(11) NOT NULL AUTO_INCREMENT,
+  `TeamGroupID` int(11) DEFAULT NULL,
+  `Name` varchar(30) NOT NULL,
+  `Active` bit(1) DEFAULT NULL,
+  `CreatedOn` datetime DEFAULT NULL,
+  `CreatedBy` int(11) DEFAULT NULL,
+  `UpdatedOn` datetime DEFAULT NULL,
+  `UpdatedBy` int(11) DEFAULT NULL,
+  PRIMARY KEY (`TeamID`),
+  KEY `TeamGroupID` (`TeamGroupID`),
+  KEY `CreatedBy` (`CreatedBy`),
+  KEY `UpdatedBy` (`UpdatedBy`),
+  CONSTRAINT `team_ibfk_1` FOREIGN KEY (`TeamGroupID`) REFERENCES `teamgroup` (`TeamGroupID`),
+  CONSTRAINT `team_ibfk_2` FOREIGN KEY (`CreatedBy`) REFERENCES `users` (`UserID`),
+  CONSTRAINT `team_ibfk_3` FOREIGN KEY (`UpdatedBy`) REFERENCES `users` (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `teamgroup` */
+
+DROP TABLE IF EXISTS `teamgroup`;
+
+CREATE TABLE `teamgroup` (
+  `TeamGroupID` int(11) NOT NULL AUTO_INCREMENT,
+  `TournamentID` int(11) DEFAULT NULL,
+  `Name` varchar(30) DEFAULT NULL,
+  `CreatedOn` datetime DEFAULT NULL,
+  `CreatedBy` int(11) DEFAULT NULL,
+  `UpdatedOn` datetime DEFAULT NULL,
+  `UpdatedBy` int(11) DEFAULT NULL,
+  PRIMARY KEY (`TeamGroupID`),
+  KEY `TournamentID` (`TournamentID`),
+  KEY `CreatedBy` (`CreatedBy`),
+  KEY `UpdatedBy` (`UpdatedBy`),
+  CONSTRAINT `teamgroup_ibfk_1` FOREIGN KEY (`TournamentID`) REFERENCES `tournament` (`TournamentID`),
+  CONSTRAINT `teamgroup_ibfk_2` FOREIGN KEY (`CreatedBy`) REFERENCES `users` (`UserID`),
+  CONSTRAINT `teamgroup_ibfk_3` FOREIGN KEY (`UpdatedBy`) REFERENCES `users` (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `tournament` */
+
+DROP TABLE IF EXISTS `tournament`;
+
+CREATE TABLE `tournament` (
+  `TournamentID` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(50) NOT NULL,
+  `RegistrationStartTime` datetime NOT NULL,
+  `RegistrationEndTime` datetime NOT NULL,
+  `StartDate` datetime NOT NULL,
+  `EndDate` datetime NOT NULL,
+  `category` int(11) NOT NULL COMMENT 'single/double/trippler etc',
+  `GameType` int(11) NOT NULL COMMENT '(fifa/CS/other)',
+  `gameserver` int(11) NOT NULL COMMENT '(a lookup,XboX/PSN)',
+  `Fee` float NOT NULL,
+  `Bracketloosened` bit(1) DEFAULT NULL COMMENT 'Tells if the Bracket is completed,matches fixed,and ready to show to participents',
+  `Active` bit(1) DEFAULT NULL,
+  `CreatedOn` datetime NOT NULL,
+  `CreatedBy` int(11) NOT NULL,
+  `UpdatedOn` datetime DEFAULT NULL,
+  `UpdatedBy` int(11) DEFAULT NULL,
+  PRIMARY KEY (`TournamentID`,`Name`,`RegistrationStartTime`,`RegistrationEndTime`,`StartDate`,`EndDate`,`category`,`GameType`,`gameserver`,`Fee`,`CreatedOn`,`CreatedBy`),
+  KEY `category` (`category`),
+  KEY `GameType` (`GameType`),
+  KEY `gameserver` (`gameserver`),
+  KEY `CreatedBy` (`CreatedBy`),
+  KEY `UpdatedBy` (`UpdatedBy`),
+  CONSTRAINT `tournament_ibfk_1` FOREIGN KEY (`category`) REFERENCES `lookup` (`LookUpID`),
+  CONSTRAINT `tournament_ibfk_2` FOREIGN KEY (`GameType`) REFERENCES `lookup` (`LookUpID`),
+  CONSTRAINT `tournament_ibfk_3` FOREIGN KEY (`gameserver`) REFERENCES `lookup` (`LookUpID`),
+  CONSTRAINT `tournament_ibfk_4` FOREIGN KEY (`CreatedBy`) REFERENCES `users` (`UserID`),
+  CONSTRAINT `tournament_ibfk_5` FOREIGN KEY (`UpdatedBy`) REFERENCES `users` (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `tournamentplayer` */
+
+DROP TABLE IF EXISTS `tournamentplayer`;
+
+CREATE TABLE `tournamentplayer` (
+  `TournamentPlayerID` int(11) NOT NULL AUTO_INCREMENT,
+  `TournamentID` int(11) NOT NULL,
+  `PlayerID` int(11) NOT NULL,
+  `TeamID` int(11) DEFAULT NULL,
+  `PointsScored` float DEFAULT NULL,
+  `Active` bit(1) DEFAULT NULL,
+  `CreatedOn` datetime DEFAULT NULL,
+  `CreatedBy` int(11) DEFAULT NULL,
+  `UpdatedOn` datetime DEFAULT NULL,
+  `UpdatedBy` int(11) DEFAULT NULL,
+  PRIMARY KEY (`TournamentPlayerID`),
+  KEY `TournamentID` (`TournamentID`),
+  KEY `PlayerID` (`PlayerID`),
+  KEY `TeamID` (`TeamID`),
+  KEY `CreatedBy` (`CreatedBy`),
+  KEY `UpdatedBy` (`UpdatedBy`),
+  CONSTRAINT `tournamentplayer_ibfk_1` FOREIGN KEY (`TournamentID`) REFERENCES `tournament` (`TournamentID`),
+  CONSTRAINT `tournamentplayer_ibfk_2` FOREIGN KEY (`PlayerID`) REFERENCES `player` (`PlayerID`),
+  CONSTRAINT `tournamentplayer_ibfk_3` FOREIGN KEY (`TeamID`) REFERENCES `team` (`TeamID`),
+  CONSTRAINT `tournamentplayer_ibfk_4` FOREIGN KEY (`CreatedBy`) REFERENCES `users` (`UserID`),
+  CONSTRAINT `tournamentplayer_ibfk_5` FOREIGN KEY (`UpdatedBy`) REFERENCES `users` (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `tournamentrule` */
+
+DROP TABLE IF EXISTS `tournamentrule`;
+
+CREATE TABLE `tournamentrule` (
+  `RuleID` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(30) NOT NULL,
+  `Desc` varchar(300) NOT NULL,
+  `TournamentID` int(11) NOT NULL,
+  `CreatedOn` datetime DEFAULT NULL,
+  `CreatedBy` int(11) DEFAULT NULL,
+  `UpdatedOn` datetime DEFAULT NULL,
+  `UpdatedBy` int(11) DEFAULT NULL,
+  PRIMARY KEY (`RuleID`),
+  KEY `TournamentID` (`TournamentID`),
+  KEY `CreatedBy` (`CreatedBy`),
+  KEY `UpdatedBy` (`UpdatedBy`),
+  CONSTRAINT `tournamentrule_ibfk_1` FOREIGN KEY (`TournamentID`) REFERENCES `tournament` (`TournamentID`),
+  CONSTRAINT `tournamentrule_ibfk_2` FOREIGN KEY (`CreatedBy`) REFERENCES `users` (`UserID`),
+  CONSTRAINT `tournamentrule_ibfk_3` FOREIGN KEY (`UpdatedBy`) REFERENCES `users` (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Table structure for table `users` */
+
+DROP TABLE IF EXISTS `users`;
+
+CREATE TABLE `users` (
+  `UserID` int(11) NOT NULL AUTO_INCREMENT,
+  `FName` varchar(20) NOT NULL,
+  `LName` varchar(20) NOT NULL,
+  `email` varchar(40) NOT NULL,
+  `username` varchar(30) DEFAULT NULL,
+  `password` varchar(20) NOT NULL,
+  `phone` varchar(20) NOT NULL,
+  `image` varchar(60) DEFAULT NULL COMMENT 'store image filename',
+  `DOB` date DEFAULT NULL,
+  `Active` bit(1) DEFAULT NULL,
+  `CreatedOn` datetime DEFAULT NULL,
+  `UpdatedOn` datetime DEFAULT NULL,
+  PRIMARY KEY (`UserID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
